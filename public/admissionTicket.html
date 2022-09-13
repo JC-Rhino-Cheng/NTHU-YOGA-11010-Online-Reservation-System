@@ -1,0 +1,55 @@
+<!doctype html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>驗票驗票驗票</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link href="css/logIn_or_admissionTicket.css" rel="stylesheet">
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase.js"
+    integrity="sha384-TBcdbu1ltWym/ugy+ntdR2Yw2SA+KxICqexo1k5QX6MjYxVu46wXIsj4Q7AUxMVd"
+    crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-app.js"
+    integrity="sha384-Q4E1UXigqkyjIO3F08vSWRbT0b+oTUY1GwLa5BuoAZkCcxzitThNAKOleFuVCXMG"
+    crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-auth.js"
+    integrity="sha384-NdaijmMO+EKSEeACesQmcrMQPyy2ihCAxHoVXavwOqb5aGLnwrv3uIp4R8pu+JOB"
+    crossorigin="anonymous"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-database.js"
+    integrity="sha384-XFOI5tKuQHNGDynfgKOkkMTUEK+ziHYA/mm3AniMBbEprfBitGIxO9Zb40W8vmFs"
+    crossorigin="anonymous"></script>
+
+  <script src="js/config.js"></script>
+  <script src="js/admissionTicket.js"></script>
+</head>
+
+<body class="text-center">
+  <div class="Form">
+    <div id="statusIcon">
+      <img id="statusImg" class="mb-8" src="img/loadingMark.gif" alt="您的網絡不穩定，無法正常載入圖片" height="120">
+    </div>
+
+    <br>
+    <br>
+
+
+    <span class="h1 mb-5 font-weight-bold text-dark" id="verifying">驗證中</span>
+    <span class="h1 mb-5 font-weight-bold text-success" id="verificationOKed"></span>
+    <span class="h1 mb-5 font-weight-bold text-danger" id="verificationFailed"></span>
+  </div>
+</body>
+
+</html>

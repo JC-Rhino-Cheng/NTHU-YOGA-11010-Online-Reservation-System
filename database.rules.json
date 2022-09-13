@@ -1,0 +1,65 @@
+{
+    "rules": {
+        ".read": false,
+        ".write": false,
+        "QRCodeInfo": {
+            ".read": "auth.uid != null",
+            ".write": "root.child('users').child(auth.uid).child('admin').val() == 'Y' && (newData.child('backgroundColour').isString() && newData.child('backgroundColour').val().matches(/^[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]$/)) && (newData.child('mainColour').isString() && newData.child('mainColour').val().matches(/^[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]$/)) && (newData.child('curDateOfWeek').isString() && (newData.child('curDateOfWeek').val() == 'NaN' || newData.child('curDateOfWeek').val() == 'Mon' || newData.child('curDateOfWeek').val() == 'Wed' || newData.child('curDateOfWeek').val() == 'Fri'))"
+        },
+        "announcements": {
+            ".read": true,
+            ".write": "root.child('users').child(auth.uid).child('admin').val() == 'Y'"
+            /*"root.child('users').child(auth.uid).child('admin').val() == 'Y'"*/
+            /*沒用，因為announcements在JS裡面是設計成push，而".write"只針對set或update才有用（server的邏輯是，我只怕資料被亂刪除或被亂改，但我不怕多記一點東西）*/
+            /*上面並不對，因為push本質就是set(由JS運行端自動產生有時間序的資料庫id，並且set)*/
+        },
+        "curWeek": {
+            ".read": "auth.uid != null",
+            ".write": "root.child('users').child(auth.uid).child('admin').val() == 'Y' && newData.isNumber() && newData.val() == data.val() + 1"
+        },
+        "users": {
+            ".read": "root.child('users').child(auth.uid).child('admin').val() == 'Y'",
+            ".write": false,
+            "$anyUserUID": {
+                ".read": "$anyUserUID == auth.uid",
+                ".write": "($anyUserUID == auth.uid && newData.child('AccumulatedUse').isNumber() && newData.child('QuotaRemaining').isNumber() && (newData.child('admin').isString() && ((!data.exists() && newData.child('admin').val() == 'N') || newData.child('admin').val() == data.child('admin').val())) && (newData.child('QuotaToUseThisWeek').isNumber() && newData.child('QuotaToUseThisWeek').val() <= 3 && newData.child('QuotaToUseThisWeek').val() >= 0 && ((!data.exists() && newData.child('QuotaToUseThisWeek').val() == 0) || newData.child('QuotaToUseThisWeek').val() == data.child('QuotaToUseThisWeek').val() + 1 || newData.child('QuotaToUseThisWeek').val() == data.child('QuotaToUseThisWeek').val() || newData.child('QuotaToUseThisWeek').val() == data.child('QuotaToUseThisWeek').val() - 1))) || root.child('users').child(auth.uid).child('admin').val() == 'Y'"
+                /*社員就只有在註冊帳號的時候才會write。而大部分的東西(ex: AccumulatedUse、QuotaRemaining、admin)都是社員在辦帳號的時候就會設定完成的東西，他們就無法再更改這些了（幹部的帳號才可以改）*/
+                /*社員日後能改的只有QuotaToUseThisWeek和YiSanWu*/
+                /*newData.child('admin').val() == data.child('admin').val()不能寫成newData.child('admin').val() == 'N'，否則幹部帳號的QuotaToUseThisWeek會被拒絕寫入(其實被拒絕寫入也沒關係拉)。我是因為不想讓駭客任意把admin設定成"Y"。所以，如果原本帳號不存在，則註冊的時候的帳號‘admin’屬性必須是N，而且以後的每次.write也都要一直維持著跟上次一樣的值(也就是N)*/
+                /*即便是幹部帳號，也不能newData.child('QuotaToUseThisWeek').val() == 0，因為你可能在幫他加值*/
+                /*也不能寫newData.child('QuotaRemaining').val() == data.child('QuotaRemaining').val() - data.child('QuotaToUseThisWeek').val()，理由同上，你在幫他加值，所以牽扯到QuotaToUseThisWeek的新值或舊值都不行*/
+                /*也不能寫newData.child('AccumulatedUse').val() == data.child('AccumulatedUse').val() + data.child('QuotaToUseThisWeek').val()，理由同上，你在幫他加值，所以Accumulated的新舊值根本就一樣才對！*/
+            }
+        },
+        "weeklySysRec": {
+            ".read": "root.child('users').child(auth.uid).child('admin').val() == 'Y'",
+            ".write": "root.child('users').child(auth.uid).child('admin').val() == 'Y'"
+        },
+        "weeks": {
+            ".read": "auth.uid != null",
+            ".write": false,
+            "$numOfWeek": {
+                ".write" : "root.child('users').child(auth.uid).child('admin').val() == 'Y' && newData.hasChildren(['Yi', 'San', 'Wu']) && newData.child('Yi').hasChildren(['curNum', 'Limit', 'Year', 'Month', 'Date']) && (newData.child('Yi').child('curNum').isNumber() && newData.child('Yi').child('Limit').isNumber() && newData.child('Yi').child('Year').isNumber() && newData.child('Yi').child('Month').isNumber() && newData.child('Yi').child('Date').isNumber() && (newData.child('Yi').child('curNum').val() == 0 && newData.child('Yi').child('Limit').val() >= 0)) && newData.child('San').hasChildren(['curNum', 'Limit', 'Year', 'Month', 'Date']) && (newData.child('San').child('curNum').isNumber() && newData.child('San').child('Limit').isNumber() && newData.child('San').child('Year').isNumber() && newData.child('San').child('Month').isNumber() && newData.child('San').child('Date').isNumber() && (newData.child('San').child('curNum').val() == 0 && newData.child('San').child('Limit').val() >= 0)) && newData.child('Wu').hasChildren(['curNum', 'Limit', 'Year', 'Month', 'Date']) && (newData.child('Wu').child('curNum').isNumber() && newData.child('Wu').child('Limit').isNumber() && newData.child('Wu').child('Year').isNumber() && newData.child('Wu').child('Month').isNumber() && newData.child('Wu').child('Date').isNumber() && (newData.child('Wu').child('curNum').val() == 0 && newData.child('Wu').child('Limit').val() >= 0))", 
+
+                "$dayOfWeek": {
+                    ".write": "root.child('users').child(auth.uid).child('admin').val() == 'Y' && newData.hasChildren(['curNum', 'Limit', 'Year', 'Month', 'Date']) && (newData.child('curNum').isNumber() && newData.child('Limit').isNumber() && newData.child('Year').isNumber() && newData.child('Month').isNumber() && newData.child('Date').isNumber() && (newData.child('curNum').val() == 0 && newData.child('Limit').val() >= 0))",
+
+                    "curNum": {
+                        ".write": "auth.uid != null && newData.isNumber() && (newData.val() == data.val() + 1 || newData.val() == data.val() - 1) && newData.val() <= data.parent().child('Limit').val()"
+                    },
+                    "AttendanceList": {
+                        "$anyUserUID": {
+                            ".write": "(($anyUserUID == auth.uid) && ((newData.val() == 'Y' && data.val() == 'N') || (newData.val() == 'N' && data.val() == 'Y') || (newData.val() == 'Y' && !data.exists()))) || (root.child('users').child(auth.uid).child('admin').val() == 'Y' && newData.val().matches(/^(Verified)(\\s)(@)(\\s)(20)[2-9][0-9][-\\/. ](0[1-9]|1[012])[-\\/. ](0[1-9]|[12][0-9]|3[01])(\\s)([0-1][0-9]|2[0-3])(:)([0-5][0-9])(:)([0-5][0-9])$/))"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/*rules最重要也最容易遺忘的是，在做新舊值的比較的時候，很可能「根本沒有舊值」，或者「新值跟舊值根本一樣(那麼，為何進入".write"其實很簡單，就是因為別項東西要寫入，而它因為所設計的資料架構的關係也跟著被放上來)」！！*/
+
+
+
+ 
